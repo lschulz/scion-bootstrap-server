@@ -93,7 +93,8 @@ def load_files(directory: Path) -> Dict:
             "base_number": base,
             "serial_number": serial,
         }})
-        data[f"/trcs/isd{isd}-b{base}-s{serial}"] = ("text/plain", trc.read_text())
+        data[f"/trcs/isd{isd}-b{base}-s{serial}"] = ("application/json", {})
+        data[f"/trcs/isd{isd}-b{base}-s{serial}/blob"] = ("text/plain", trc.read_text())
 
     return data
 
