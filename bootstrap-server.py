@@ -27,7 +27,7 @@ import re
 import time
 from http import HTTPStatus
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
@@ -46,7 +46,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
     def do_HEAD(self) -> None:
         self.send_head()
 
-    def send_head(self) -> bytes:
+    def send_head(self) -> Optional[bytes]:
         try:
             ctype, content = self.data[self.path]
         except KeyError:
@@ -60,7 +60,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", len(encoded_content))
+        self.send_header("Content-Length", str(len(encoded_content)))
         self.send_header("Last-Modified",
             email.utils.formatdate(time.time(), usegmt=True))
         self.end_headers()
@@ -69,7 +69,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
 
 def parse_trc_name(name: str) -> Tuple[int, int, int]:
-    m = re.match(r"ISD(\d)+-B(\d)+-S(\d)+", name)
+    m = re.fullmatch(r"ISD(\d+)-B(\d+)-S(\d+)", name)
     if not m:
         raise ValueError()
     return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
